@@ -1,0 +1,85 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Access control rules for autosla-network
+ */
+rule R1a_OwnerSeeUpdateThemselvesOnly {
+  description: "Owner can update their own record only"
+  participant(t): "org.trackerosnetwork.Owner"
+  operation: UPDATE
+  resource(v): "org.trackerosnetwork.Owner"
+  condition: (v.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule R1aa_OwnerSeeAllSameName {
+  description: "Owner can see the other records with his same name"
+  participant(t): "org.trackerosnetwork.Owner"
+  operation: READ
+  resource(v): "org.trackerosnetwork.Owner"
+  condition: (v.name == t.name)
+  action: ALLOW
+}
+
+rule R1aaa_AdminsUpdateSameName {
+  description: "Admins can update the other records with his same name"
+  participant(t): "org.trackerosnetwork.Owner"
+  operation: UPDATE
+  resource(v): "org.trackerosnetwork.Owner"
+  condition: ((t.typeIden == "Admin") && (t.name == v.name))
+  action: ALLOW
+}
+
+rule R1b_OwnerSeeTheirPallets {
+  description: "Owner can see their own Pallets"
+  participant(t): "org.trackerosnetwork.Owner"
+  operation: READ
+  resource(c): "org.trackerosnetwork.Pallet"
+  condition: (t.name == c.owner.name)
+  action: ALLOW
+}
+
+rule R1bb_HolderSeeTheirPallets {
+  description: "Holder can see their Pallets holding"
+  participant(t): "org.trackerosnetwork.Owner"
+  operation: READ
+  resource(v): "org.trackerosnetwork.Pallet"
+  condition: (t.name == v.holder.name)
+  action: ALLOW
+}
+
+rule R2a_EnableTradeTxn {
+  description: "Enable Owners to submit trades"
+  participant: "org.trackerosnetwork.Owner"
+  operation: ALL
+  resource: "org.trackerosnetwork.TradeHolder"
+  action: ALLOW
+}
+
+rule AdminAccessAll {
+  description: "Permit admin to all access"
+  participant: "org.hyperledger.composer.system.NetworkAdmin"
+  operation: ALL
+  resource: "org.trackerosnetwork.**"
+  action: ALLOW
+}
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "ANY"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
