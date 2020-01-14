@@ -1,4 +1,4 @@
-Projecte de PAE - thethins.io
+Projecte de PAE - thethings.io
 
 -Sergi Serrano Casalins
 -Quim Lazaro Gel
